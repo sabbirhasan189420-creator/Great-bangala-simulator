@@ -5,146 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For You ❤️</title>
     <style>
-        /* CSS Styling - Soft, romantic theme matching the video */
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;400;500&display=swap');
-
+        /* --- Modern CSS Variables --- */
         :root {
-            --primary-color: #9d2a50; /* Deep pink/maroon */
-            --bg-color: #fff5f7; /* Very light pink background */
-            --card-bg: #ffffff;
-            --text-dark: #333333;
-            --text-light: #666666;
+            --bg-color: #fdf5f7;
+            --surface-color: #ffffff;
+            --primary: #9d2a50;
+            --primary-hover: #7a1f3d;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border-color: #fce7ec;
+            --nav-bg: rgba(253, 245, 247, 0.9);
+        }
+
+        /* --- Global Reset & Typography --- */
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nunito:wght@400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Nunito', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--surface-color);
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        /* --- Typography Elements --- */
+        h1, h2, .cursive {
+            font-family: 'Great Vibes', cursive;
+            color: var(--text-main);
+            font-weight: 400;
+        }
+
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 1rem; }
+
+        /* --- Entry Screen --- */
+        #entry-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            justify-content: center;
+            height: 100vh;
+            padding: 2rem;
+            text-align: center;
         }
 
-        /* Navigation Bar */
-        nav {
-            width: 100%;
-            max-width: 500px;
+        #entry-screen h1 { font-size: 3.5rem; margin-bottom: 0.5rem; }
+        
+        .btn-group {
             display: flex;
-            justify-content: space-around;
-            background-color: var(--bg-color);
-            padding: 15px 0;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* --- Main App Screen --- */
+        #main-app {
+            display: none; /* Hidden until entry screen is passed */
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        /* Navigation */
+        nav {
             position: sticky;
             top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #f0d0d8;
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
         }
 
-        .nav-btn {
+        .nav-item {
             background: none;
             border: none;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            color: var(--text-light);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            color: var(--text-muted);
             cursor: pointer;
-            padding-bottom: 5px;
-            transition: 0.3s;
+            position: relative;
+            padding-bottom: 0.25rem;
+            transition: color 0.3s;
         }
 
-        .nav-btn.active {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            font-weight: 500;
-        }
-
-        /* Main Content Container */
-        .container {
+        .nav-item.active { color: var(--primary); }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-sizing: border-box;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
         }
 
-        /* Sections (Hidden by default, shown when active) */
-        .section {
+        /* --- Content Sections & Cards --- */
+        .content-area {
+            padding: 1.5rem;
+            padding-bottom: 4rem;
+        }
+
+        .tab-section {
             display: none;
-            animation: fadeIn 0.5s ease;
+            animation: slideUp 0.4s ease-out forwards;
         }
 
-        .section.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
+        .tab-section.active { display: block; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Card Styling (Used for Gifts, Flowers, Letter) */
         .card {
-            background-color: var(--card-bg);
-            width: 100%;
-            border-radius: 15px;
-            padding: 30px 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
             text-align: center;
-            box-sizing: border-box;
-            border: 1px solid #fae1e8;
+            transition: transform 0.2s;
         }
 
-        /* Typography */
-        h1 {
-            font-family: 'Dancing Script', cursive;
-            color: var(--text-dark);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .cursive-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2rem;
-            margin-bottom: 15px;
+        .card:hover { transform: translateY(-2px); }
+
+        .emoji-lg { font-size: 4rem; margin-bottom: 1rem; display: inline-block; }
+
+        /* --- Letter Specific Styling --- */
+        .letter-paper {
+            background-color: #fff;
+            padding: 2rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.05);
+            /* Creating the ruled line paper effect */
+            background-image: repeating-linear-gradient(transparent, transparent 31px, var(--border-color) 31px, var(--border-color) 32px);
+            line-height: 32px;
         }
 
-        p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.6;
+        .letter-paper p {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin: 0;
+            padding-top: 6px;
         }
 
-        /* Emojis as placeholders for images */
-        .big-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-
-        /* Letter Specific Styling */
-        .letter-content {
-            text-align: left;
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.4rem;
-            line-height: 1.8;
-            color: var(--text-dark);
-            background-image: repeating-linear-gradient(transparent, transparent 31px, #f0d0d8 31px, #f0d0d8 32px);
-            padding-top: 30px;
-        }
-
-        /* Video Container */
-        .video-container {
+        /* --- Video Embed --- */
+        .video-wrapper {
             position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            border-radius: 15px;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 1.5rem 0;
         }
-        
-        .video-container iframe {
+
+        .video-wrapper iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -156,113 +223,148 @@
 </head>
 <body>
 
-    <nav>
-        <button class="nav-btn active" onclick="switchTab('greetings')">Greetings</button>
-        <button class="nav-btn" onclick="switchTab('gifts')">Gifts</button>
-        <button class="nav-btn" onclick="switchTab('flowers')">Flowers</button>
-        <button class="nav-btn" onclick="switchTab('song')">Song</button>
-        <button class="nav-btn" onclick="switchTab('letter')">Letter</button>
-    </nav>
-
-    <div class="container">
-
-        <div id="greetings" class="section active">
-            <div class="card">
-                <div class="big-icon">🧸</div>
-                <h1>For You, [Name]</h1>
-                <div class="big-icon" style="font-size: 30px;">💕</div>
-                <p>You make every day brighter just by being in it. I love you.</p>
+    <div class="app-container">
+        
+        <!-- 1. ENTRY SCREEN -->
+        <section id="entry-screen">
+            <span class="emoji-lg">🐧</span>
+            <h1>Hey love</h1>
+            <p>I made something just for you, [Her Name] — want to see it?</p>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-yes">YES PLEASE</button>
+                <button class="btn btn-secondary" onclick="alert('Aww, maybe later! 😊')">NO THANKS</button>
             </div>
-        </div>
+        </section>
 
-        <div id="gifts" class="section">
-            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
-                <div class="big-icon">🌙</div>
-                <p><em>A night under the stars, just for the two of us.</em></p>
-                <p style="font-size: 12px; color: var(--primary-color);"><strong>Tap to open!</strong></p>
+        <!-- 2. MAIN APP CONTENT -->
+        <main id="main-app">
+            
+            <!-- Navigation -->
+            <nav id="navbar">
+                <button class="nav-item active" data-target="greetings">Greetings</button>
+                <button class="nav-item" data-target="gifts">Gifts</button>
+                <button class="nav-item" data-target="flowers">Flowers</button>
+                <button class="nav-item" data-target="song">Song</button>
+                <button class="nav-item" data-target="letter">Letter</button>
+            </nav>
+
+            <div class="content-area">
+                
+                <!-- Greetings Tab -->
+                <section id="greetings" class="tab-section active">
+                    <div class="card">
+                        <h2 style="font-size: 3rem;">For You, [Her Name]</h2>
+                        <span class="emoji-lg">💕</span>
+                        <p class="mt-1">You make every day brighter just by being in it. I love you.</p>
+                        <span class="emoji-lg mt-1" style="font-size: 3rem;">🐧</span>
+                    </div>
+                </section>
+
+                <!-- Gifts Tab -->
+                <section id="gifts" class="tab-section">
+                    <div class="card text-center">
+                        <span class="emoji-lg">🌙</span>
+                        <p><em>A night under the stars, just for the two of us.</em></p>
+                    </div>
+                    <div class="card text-center">
+                        <span class="emoji-lg">☕</span>
+                        <p><em>Your favourite drink, your favourite book, a perfect afternoon.</em></p>
+                    </div>
+                    <div class="card text-center">
+                        <span class="emoji-lg">🫂</span>
+                        <p><em>A thousand hugs, redeemable anytime, forever.</em></p>
+                    </div>
+                </section>
+
+                <!-- Flowers Tab -->
+                <section id="flowers" class="tab-section">
+                    <div class="card">
+                        <h2 style="font-size: 2.5rem;">A Bouquet, Just For You</h2>
+                        <span class="emoji-lg">💐</span>
+                        <p>Every flower in here is a reason I'm grateful for you, [Her Name]. 🌹</p>
+                    </div>
+                    <div class="card">
+                        <span class="emoji-lg">🌹</span>
+                        <h3 class="cursive" style="font-size: 2rem;">Red Rose</h3>
+                        <p>"You're as beautiful as freshly bloomed roses."</p>
+                    </div>
+                    <div class="card">
+                        <span class="emoji-lg">🌸</span>
+                        <h3 class="cursive" style="font-size: 2rem;">Cherry Blossom</h3>
+                        <p>"Being around you feels like walking through a blooming spring."</p>
+                    </div>
+                </section>
+
+                <!-- Song Tab -->
+                <section id="song" class="tab-section">
+                    <div class="card">
+                        <span class="emoji-lg" style="font-size: 3rem;">🎵</span>
+                        <h2 style="font-size: 2.5rem;">A Song for You</h2>
+                        
+                        <!-- YouTube Embed -->
+                        <div class="video-wrapper">
+                            <iframe src="https://www.youtube.com/embed/Pzz-X1A2-jQ" title="Song for you" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Letter Tab -->
+                <section id="letter" class="tab-section">
+                    <div class="letter-paper">
+                        <p>Dear [Her Name],</p><br>
+                        <p>There are people in this world who make everything better just by existing — and you are one of them.</p><br>
+                        <p>I don't always find the right words, but today I want you to know that you are seen, appreciated, and deeply loved.</p><br>
+                        <p>I love you, from the bottom of my heart.</p><br>
+                        <p style="text-align: right;">With love,</p>
+                        <p style="text-align: right;">[Your Name] ❤️</p>
+                    </div>
+                </section>
+
             </div>
-
-            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
-                <div class="big-icon">☕</div>
-                <p><em>Your favourite drink, your favourite book, a perfect afternoon.</em></p>
-                <p style="font-size: 12px; color: var(--primary-color);"><strong>Tap to open!</strong></p>
-            </div>
-
-            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
-                <div class="big-icon">🫂</div>
-                <p><em>A thousand hugs, redeemable anytime, forever.</em></p>
-            </div>
-        </div>
-
-        <div id="flowers" class="section">
-            <div class="card">
-                <h2 class="cursive-title">A Bouquet, Just For You</h2>
-                <div class="big-icon">💐</div>
-                <p>Every flower in here is a reason I'm grateful for you.</p>
-            </div>
-
-            <div class="card">
-                <div class="big-icon">🌹</div>
-                <h3 style="margin: 5px 0;">Red Rose</h3>
-                <p><em>"You're as beautiful as freshly bloomed roses."</em></p>
-            </div>
-
-            <div class="card">
-                <div class="big-icon">🌷</div>
-                <h3 style="margin: 5px 0;">Tulip</h3>
-                <p><em>"Spending time with you is like receiving a surprise bouquet every day."</em></p>
-            </div>
-        </div>
-
-        <div id="song" class="section">
-            <div class="card">
-                <div class="big-icon" style="font-size: 40px;">🎵</div>
-                <h2 class="cursive-title">A Song for You</h2>
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/Pzz-X1A2-jQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-                <p style="margin-top: 15px;">Because this song always reminds me of you.</p>
-            </div>
-        </div>
-
-        <div id="letter" class="section">
-            <div class="card" style="padding-bottom: 50px;">
-                <div class="letter-content">
-                    Dear [Name],<br><br>
-                    There are people in this world who make everything better just by existing — and you are one of them.<br><br>
-                    I don't always find the right words, but today I want you to know that you are seen, appreciated, and deeply loved.<br><br>
-                    I love you, from the bottom of my heart.<br><br>
-                    With love,<br>
-                    [Your Name] ❤️
-                </div>
-            </div>
-        </div>
-
+        </main>
     </div>
 
+    <!-- --- JavaScript --- -->
     <script>
-        function switchTab(tabId) {
-            // 1. Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // 2. Remove 'active' styling from all navigation buttons
-            const navButtons = document.querySelectorAll('.nav-btn');
-            navButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // 3. Show the selected section
-            document.getElementById(tabId).classList.add('active');
-
-            // 4. Highlight the clicked button
-            event.currentTarget.classList.add('active');
+        document.addEventListener('DOMContentLoaded', () => {
             
-            // Scroll to top when changing tabs
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            // 1. Handle Entry Screen Transition
+            const btnYes = document.getElementById('btn-yes');
+            const entryScreen = document.getElementById('entry-screen');
+            const mainApp = document.getElementById('main-app');
+
+            btnYes.addEventListener('click', () => {
+                entryScreen.style.display = 'none';
+                mainApp.style.display = 'block';
+                // Trigger reflow for fade-in effect
+                void mainApp.offsetWidth; 
+                mainApp.style.opacity = '1';
+                window.scrollTo(0, 0);
+            });
+
+            // 2. Handle Navigation Tab Switching
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabSections = document.querySelectorAll('.tab-section');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove active state from all buttons and sections
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    tabSections.forEach(section => section.classList.remove('active'));
+
+                    // Add active state to clicked button
+                    item.classList.add('active');
+
+                    // Show the corresponding target section
+                    const targetId = item.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+
+                    // Smooth scroll to the top of the content area
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
     </script>
 </body>
 </html>
