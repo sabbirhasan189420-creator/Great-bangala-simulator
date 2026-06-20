@@ -1,192 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🌏 Great Bangala Simulator</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-    body, html {margin:0; padding:0; height:100%; font-family: Arial, sans-serif;}
-    #container {display:flex; height:100vh;}
-    #sidebar {width:400px; padding:10px; overflow-y:auto; border-right:2px solid #ccc; background:#fff;}
-    #map {flex:1; height:100%;}
-    .state-btn {margin:3px; padding:6px 12px; border:none; cursor:pointer; border-radius:4px;}
-    .selected {background:#3498db; color:white;}
-    .upgrade-panel {border:1px solid #ccc; padding:5px; margin-bottom:5px; border-radius:4px; background:#f9f9f9;}
-    .event-log {height:150px; overflow-y:scroll; border:1px solid #ccc; padding:5px; background:#f0f0f0;}
-    h4 {margin:5px 0;}
-    button.upgrade-btn {margin-left:5px; padding:2px 5px;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <style>
+        /* CSS Styling - Soft, romantic theme matching the video */
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;400;500&display=swap');
+
+        :root {
+            --primary-color: #9d2a50; /* Deep pink/maroon */
+            --bg-color: #fff5f7; /* Very light pink background */
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        nav {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #f0d0d8;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text-light);
+            cursor: pointer;
+            padding-bottom: 5px;
+            transition: 0.3s;
+        }
+
+        .nav-btn.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Main Content Container */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Sections (Hidden by default, shown when active) */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Styling (Used for Gifts, Flowers, Letter) */
+        .card {
+            background-color: var(--card-bg);
+            width: 100%;
+            border-radius: 15px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid #fae1e8;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: var(--text-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .cursive-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Emojis as placeholders for images */
+        .big-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        /* Letter Specific Styling */
+        .letter-content {
+            text-align: left;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            background-image: repeating-linear-gradient(transparent, transparent 31px, #f0d0d8 31px, #f0d0d8 32px);
+            padding-top: 30px;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-<div id="container">
-  <div id="sidebar">
-    <h2>🌏 Great Bangala Simulator</h2>
-    <div id="state-tabs"></div>
-    <div id="upgrade-panel"></div>
 
-    <h3>📊 Nation Dashboard</h3>
-    <p>Population: <span id="population">0</span></p>
-    <p>GDP: $<span id="gdp">0</span></p>
-    <p>Military: <span id="military">0</span></p>
-    <p>Admin Power: <span id="adminPower">50</span></p>
-    <p>Stability: <span id="stability">80</span>%</p>
+    <nav>
+        <button class="nav-btn active" onclick="switchTab('greetings')">Greetings</button>
+        <button class="nav-btn" onclick="switchTab('gifts')">Gifts</button>
+        <button class="nav-btn" onclick="switchTab('flowers')">Flowers</button>
+        <button class="nav-btn" onclick="switchTab('song')">Song</button>
+        <button class="nav-btn" onclick="switchTab('letter')">Letter</button>
+    </nav>
 
-    <h3>📝 Event Log</h3>
-    <div class="event-log" id="event-log"></div>
-  </div>
-  <div id="map"></div>
-</div>
+    <div class="container">
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-// ========================
-// Country
-// ========================
-let country = { population:10000000, gdp:50000000000, military:5000, adminPower:50, stability:80 };
+        <div id="greetings" class="section active">
+            <div class="card">
+                <div class="big-icon">🧸</div>
+                <h1>For You, [Name]</h1>
+                <div class="big-icon" style="font-size: 30px;">💕</div>
+                <p>You make every day brighter just by being in it. I love you.</p>
+            </div>
+        </div>
 
-// ========================
-// States (4 BD + 12 India)
-// ========================
-let states = [
-  {name:"Dhaka Region", capital:"Dhaka", color:"#3498db", coords:[[23,90],[24,90],[24,91],[23,91]], landmarks:["Dhaka Land1","Dhaka Land2"]},
-  {name:"Banga Province", capital:"Faridpur", color:"#2ecc71", coords:[[22,89],[23,89],[23,90],[22,90]], landmarks:["Faridpur Land1","Faridpur Land2"]},
-  {name:"Gauda Province", capital:"Rajshahi", color:"#f1c40f", coords:[[24,88],[25,88],[25,89],[24,89]], landmarks:["Rajshahi Land1","Rajshahi Land2"]},
-  {name:"Purbochal State", capital:"Comilla", color:"#e67e22", coords:[[23,91],[24,91],[24,92],[23,92]], landmarks:["Comilla Land1","Comilla Land2"]},
-  {name:"West Bengal", capital:"Kolkata", color:"#9b59b6", coords:[[22,87],[23,87],[23,88],[22,88]], landmarks:["Victoria Memorial","Howrah Bridge"]},
-  {name:"Bihar", capital:"Patna", color:"#1abc9c", coords:[[25,84],[26,84],[26,85],[25,85]], landmarks:["Mahavir Mandir","Patna Museum"]},
-  {name:"Jharkhand", capital:"Ranchi", color:"#34495e", coords:[[23,85],[24,85],[24,86],[23,86]], landmarks:["Jagannath Temple","Rock Garden"]},
-  {name:"Odisha", capital:"Bhubaneswar", color:"#d35400", coords:[[20,85],[21,85],[21,86],[20,86]], landmarks:["Lingaraj Temple","Konark"]},
-  {name:"Sikkim", capital:"Gangtok", color:"#c0392b", coords:[[27,88],[28,88],[28,89],[27,89]], landmarks:["Rumtek Monastery"]},
-  {name:"Assam", capital:"Dispur", color:"#7f8c8d", coords:[[26,92],[27,92],[27,93],[26,93]], landmarks:["Kaziranga NP"]},
-  {name:"Meghalaya", capital:"Shillong", color:"#16a085", coords:[[25,91],[26,91],[26,92],[25,92]], landmarks:["Cherrapunjee","Shillong Peak"]},
-  {name:"Arunachal Pradesh", capital:"Itanagar", color:"#2980b9", coords:[[28,94],[29,94],[29,95],[28,95]], landmarks:["Tawang Monastery"]},
-  {name:"Manipur", capital:"Imphal", color:"#d35400", coords:[[24,93],[25,93],[25,94],[24,94]], landmarks:["Loktak Lake"]},
-  {name:"Nagaland", capital:"Kohima", color:"#8e44ad", coords:[[25,94],[26,94],[26,95],[25,95]], landmarks:["Dzükou Valley"]},
-  {name:"Mizoram", capital:"Aizawl", color:"#27ae60", coords:[[23,92],[24,92],[24,93],[23,93]], landmarks:["Reiek Hills"]},
-  {name:"Tripura", capital:"Agartala", color:"#f39c12", coords:[[23,91],[24,91],[24,92],[23,92]], landmarks:["Ujjayanta Palace"]}
-];
+        <div id="gifts" class="section">
+            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
+                <div class="big-icon">🌙</div>
+                <p><em>A night under the stars, just for the two of us.</em></p>
+                <p style="font-size: 12px; color: var(--primary-color);"><strong>Tap to open!</strong></p>
+            </div>
 
-// ========================
-// Cities (3 per state)
-// ========================
-let cities = [];
-states.forEach(s=>{
-  for(let i=1;i<=3;i++){
-    cities.push({name:s.capital+" City "+i, state:s.name, lat:s.coords[0][0]+0.1*i, lng:s.coords[0][1]+0.1*i, population:50000*i, upgrades:{roads:0,hospitals:0,schools:0,universities:0,militaryTech:0}});
-  }
-});
+            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
+                <div class="big-icon">☕</div>
+                <p><em>Your favourite drink, your favourite book, a perfect afternoon.</em></p>
+                <p style="font-size: 12px; color: var(--primary-color);"><strong>Tap to open!</strong></p>
+            </div>
 
-// ========================
-// Selected state
-// ========================
-let selectedState = states[0];
+            <div class="card" onclick="alert('Digital Gift Coupon Redeemed!')" style="cursor: pointer;">
+                <div class="big-icon">🫂</div>
+                <p><em>A thousand hugs, redeemable anytime, forever.</em></p>
+            </div>
+        </div>
 
-// ========================
-// Map
-// ========================
-let map = L.map('map').setView([23.7,90.3],6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-let polygons = {};
-states.forEach(s=>{
-  let poly = L.polygon(s.coords,{color:s.color,fillOpacity:0.3}).addTo(map);
-  poly.bindPopup(`<b>${s.name}</b><br>Capital: ${s.capital}<br>Landmarks:<br>- ${s.landmarks.join("<br>- ")}`);
-  poly.on('click',()=>{ selectedState=s; renderUpgradePanel(); renderCities(); highlightTab(); });
-  polygons[s.name]=poly;
-});
+        <div id="flowers" class="section">
+            <div class="card">
+                <h2 class="cursive-title">A Bouquet, Just For You</h2>
+                <div class="big-icon">💐</div>
+                <p>Every flower in here is a reason I'm grateful for you.</p>
+            </div>
 
-// ========================
-// Tabs
-// ========================
-function renderTabs(){
-  let container = document.getElementById('state-tabs');
-  container.innerHTML='';
-  states.forEach(s=>{
-    let btn = document.createElement('button');
-    btn.className='state-btn '+(s.name===selectedState.name?'selected':'');
-    btn.innerText=s.name;
-    btn.onclick=()=>{selectedState=s; renderUpgradePanel(); renderCities(); highlightTab();};
-    container.appendChild(btn);
-  });
-}
-function highlightTab(){renderTabs();}
-renderTabs();
+            <div class="card">
+                <div class="big-icon">🌹</div>
+                <h3 style="margin: 5px 0;">Red Rose</h3>
+                <p><em>"You're as beautiful as freshly bloomed roses."</em></p>
+            </div>
 
-// ========================
-// Upgrade Panel
-// ========================
-function renderUpgradePanel(){
-  let panel = document.getElementById('upgrade-panel'); panel.innerHTML='';
-  // State
-  let sDiv = document.createElement('div'); sDiv.className='upgrade-panel';
-  sDiv.innerHTML='<h4>State: '+selectedState.name+'</h4>';
-  ['roads','hospitals','schools','universities','militaryTech'].forEach(t=>{
-    let p=document.createElement('p'); 
-    p.innerHTML=t+': 0 <button class="upgrade-btn" onclick="upgradeState(\''+t+'\')">Upgrade +</button>';
-    sDiv.appendChild(p);
-  });
-  panel.appendChild(sDiv);
-  // Cities
-  let cDiv = document.createElement('div'); cDiv.innerHTML='<h4>City Upgrades</h4>';
-  cities.filter(c=>c.state===selectedState.name).forEach(c=>{
-    let div=document.createElement('div'); div.className='upgrade-panel';
-    div.innerHTML='<b>'+c.name+'</b>';
-    ['roads','hospitals','schools','universities','militaryTech'].forEach(t=>{
-      let p=document.createElement('p'); 
-      p.innerHTML=t+': 0 <button class="upgrade-btn" onclick="upgradeCity(\''+c.name+'\',\''+t+'\')">Upgrade +</button>';
-      div.appendChild(p);
-    });
-    cDiv.appendChild(div);
-  });
-  panel.appendChild(cDiv);
-}
+            <div class="card">
+                <div class="big-icon">🌷</div>
+                <h3 style="margin: 5px 0;">Tulip</h3>
+                <p><em>"Spending time with you is like receiving a surprise bouquet every day."</em></p>
+            </div>
+        </div>
 
-// ========================
-// Upgrade Functions
-// ========================
-function upgradeState(type){
-  if(!selectedState.upgrades) selectedState.upgrades={roads:0,hospitals:0,schools:0,universities:0,militaryTech:0};
-  selectedState.upgrades[type]++;
-  if(type==="roads"||type==="schools"||type==="universities"){country.gdp+=5000000;country.population+=1000;}
-  else if(type==="hospitals"){country.stability=Math.min(100,country.stability+2);}
-  else if(type==="militaryTech"){country.military+=100;}
-  logEvent(type+' upgraded in state '+selectedState.name); updateDashboard(); renderUpgradePanel();
-}
-function upgradeCity(name,type){
-  let c = cities.find(c=>c.name===name); if(!c) return;
-  c.upgrades[type]++;
-  if(type==="roads"||type==="schools"||type==="universities"){country.gdp+=1000000;country.population+=500;}
-  else if(type==="hospitals"){country.stability=Math.min(100,country.stability+1);}
-  else if(type==="militaryTech"){country.military+=50;}
-  logEvent(type+' upgraded in city '+name); updateDashboard(); renderUpgradePanel();
-}
+        <div id="song" class="section">
+            <div class="card">
+                <div class="big-icon" style="font-size: 40px;">🎵</div>
+                <h2 class="cursive-title">A Song for You</h2>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/Pzz-X1A2-jQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p style="margin-top: 15px;">Because this song always reminds me of you.</p>
+            </div>
+        </div>
 
-// ========================
-// Render Cities on Map
-// ========================
-let markers=[];
-function renderCities(){
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  cities.filter(c=>c.state===selectedState.name).forEach(c=>{
-    let m=L.marker([c.lat,c.lng]).addTo(map);
-    m.bindPopup('<b>'+c.name+'</b><br>Population: '+c.population);
-    markers.push(m);
-  });
-}
-renderCities();
+        <div id="letter" class="section">
+            <div class="card" style="padding-bottom: 50px;">
+                <div class="letter-content">
+                    Dear [Name],<br><br>
+                    There are people in this world who make everything better just by existing — and you are one of them.<br><br>
+                    I don't always find the right words, but today I want you to know that you are seen, appreciated, and deeply loved.<br><br>
+                    I love you, from the bottom of my heart.<br><br>
+                    With love,<br>
+                    [Your Name] ❤️
+                </div>
+            </div>
+        </div>
 
-// ========================
-// Dashboard & Event Log
-// ========================
-function updateDashboard(){
-  document.getElementById('population').textContent=country.population.toLocaleString();
-  document.getElementById('gdp').textContent=country.gdp.toLocaleString();
-  document.getElementById('military').textContent=country.military.toLocaleString();
-  document.getElementById('adminPower').textContent=country.adminPower;
-  document.getElementById('stability').textContent=country.stability;
-}
-function logEvent(msg){
-  let logDiv=document.getElementById('event-log'); let entry=document.createElement('div');
-  entry.textContent='['+new Date().toLocaleTimeString()+'] '+msg; logDiv.prepend(entry);
-}
-updateDashboard(); renderUpgradePanel();
-</script>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // 1. Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // 2. Remove 'active' styling from all navigation buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 3. Show the selected section
+            document.getElementById(tabId).classList.add('active');
+
+            // 4. Highlight the clicked button
+            event.currentTarget.classList.add('active');
+            
+            // Scroll to top when changing tabs
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
